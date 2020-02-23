@@ -1,0 +1,2 @@
+[targets]
+185.59.42.208 ansible_connection=ssh ansible_port=48705 ansible_user=greyjuicelab

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Transporter at 00:00 and at 12:00
+Requires=gjl-transporter.service
+
+[Timer]
+Unit=gjl-transporter.service
+OnCalendar=0,12:00:00
+
+[Install]
+WantedBy=timers.target
