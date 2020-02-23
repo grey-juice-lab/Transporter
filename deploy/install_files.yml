@@ -3,25 +3,25 @@
   tasks:
   - name: Copy python files
     copy:
-      src: /home/ec2-user/source/transporter/python
-      dest: /home/greyjuicelab/source/transporter/python
+      src: /home/ec2-user/source/Transporter/python
+      dest: /home/greyjuicelab/source/Transporter/python
       owner: greyjuicelab
       group: greyjuicelab
     notify: "activate python script"
   - name: Change file ownership, group and permissions
     file:
-      path: /home/greyjuicelab/source/transporter/python/Transporter.py
+      path: /home/greyjuicelab/source/Transporter/python/Transporter.py
       mode: '0755'
   - name: Copy system unit files for timer (cron)
     copy:
-      src: /home/ec2-user/source/transporter/deploy/gjl-transporter.timer
+      src: /home/ec2-user/source/Transporter/deploy/gjl-transporter.timer
       dest: /etc/systemd/system/gjl-transporter.timer
       owner: root
       group: root
       mode: '0644'
   - name: Copy system service unit file
     copy:
-      src: /home/ec2-user/source/transporter/deploy/gjl-transporter.service
+      src: /home/ec2-user/source/Transporter/deploy/gjl-transporter.service
       dest: /etc/systemd/system/gjl-transporter.service
       owner: root
       group: root
@@ -34,11 +34,11 @@
   handlers:
     - name: Create venv
       listen: activate python script
-      command: python3 -mvenv /home/greyjuicelab/source/transporter/python/.venv
+      command: python3 -mvenv /home/greyjuicelab/source/Transporter/python/.venv
     - name:
       listen: activate python script
       file:
-        path: /home/greyjuicelab/source/transporter/python/.venv
+        path: /home/greyjuicelab/source/Transporter/python/.venv
         state: directory
         recurse: yes
         owner: greyjuicelab
@@ -48,9 +48,9 @@
       shell: source .venv/bin/activate
       args:
         executable: /bin/bash
-        chdir: /home/greyjuicelab/source/transporter/python/
+        chdir: /home/greyjuicelab/source/Transporter/python/
     - name: Install requirements
       listen: activate python script
       pip:
-        requirements: /home/greyjuicelab/source/transporter/python/requirements.txt
-        virtualenv: /home/greyjuicelab/source/transporter/python/.venv
+        requirements: /home/greyjuicelab/source/Transporter/python/requirements.txt
+        virtualenv: /home/greyjuicelab/source/Transporter/python/.venv

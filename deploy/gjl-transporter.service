@@ -7,8 +7,8 @@ Type=simple
 User=greyjuicelab
 EnvironmentFile=/etc/profile.d/freezer_envvars.sh
 #fix paths
-WorkingDirectory=/home/greyjuicelab/source/transporter/python
-ExecStart=/home/greyjuicelab/source/transporter/python/.venv/bin/python3 Transporter.py rules
+WorkingDirectory=/home/greyjuicelab/source/Transporter/python
+ExecStart=/home/greyjuicelab/source/Transporter/python/.venv/bin/python3 Transporter.py rules
 
 [Install]
 WantedBy=multi-user.target
