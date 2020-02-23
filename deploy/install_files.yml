@@ -4,7 +4,7 @@
   - name: Copy python files
     copy:
       src: /home/ec2-user/source/Transporter/python
-      dest: /home/greyjuicelab/source/Transporter/python
+      dest: /home/greyjuicelab/source/Transporter
       owner: greyjuicelab
       group: greyjuicelab
     notify: "activate python script"
