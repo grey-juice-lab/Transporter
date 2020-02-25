@@ -3,6 +3,7 @@ import logging
 
 PROTOCOL = re.compile(r"^([^:]+):/")
 GET_VARS = re.compile(r"{([^}]+)}")
+DUP_VAR = re.compile(r"([^\d]+?)(\d*)$")
 STARTING_PATH = re.compile(r"^[^:]+:/(/[^{]+){")
 PARSE_VAR = "(?P<{}>.+)"
 ALLOWED_PROVIDERS = ["file", "s3"]
@@ -23,6 +24,7 @@ class Uri:
 
         parts = GET_VARS.split(uri_path)                         # recover the variables into the URL
         new_re = "".join([self._subs_var(x) for x in parts])    # substitute the vars for re groups
+        print(new_re)
         self.uri_re = re.compile(new_re)
 
     def __repr__(self):
@@ -45,10 +47,14 @@ class Uri:
             return {}
 
     def replace(self, value_vars):
+        def check_replica(key):
+            check = DUP_VAR.match(key)
+            return value_vars[check.groups()[0]]
+
         output_format = self.uri_str
         for key in value_vars.keys():
             if key in self.vars:
-                output_format = output_format.replace(r"{{{}}}".format(key), value_vars[key])
+                output_format = output_format.replace(r"{{{}}}".format(key), value_vars.get(key, check_replicas(key)))
         if "{" not in output_format:
             self.logger.debug("Uri {} replaced to {}".format(self.uri_str, output_format))
 
