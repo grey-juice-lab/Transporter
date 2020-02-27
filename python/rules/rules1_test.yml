@@ -1,0 +1,11 @@
+---
+rules:
+    - id: "rule_testing"
+      description: "first test to moving"
+      from: "file://var/gjl/test/{client}/4.Content_Delivered/{path}/{code}_{encoding}_{rest}"
+      to: "s3://gjl-client-backup/{client}/{encoding}/{code}_{encoding2}_{rest}"
+      glacier: false
+      no_match_vars:
+          code: "_"
+          encoding: "_"
+          

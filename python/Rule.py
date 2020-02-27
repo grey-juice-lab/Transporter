@@ -6,6 +6,7 @@ GET_VARS = re.compile(r"{([^}]+)}")
 DUP_VAR = re.compile(r"([^\d]+?)(\d*)$")
 STARTING_PATH = re.compile(r"^[^:]+:/(/[^{]+){")
 PARSE_VAR = "(?P<{}>.+)"
+PARSE_NO_VAR = "(?P<{}>[^{}]+)"
 ALLOWED_PROVIDERS = ["file", "s3"]
 
 
@@ -13,13 +14,13 @@ class Uri:
     """ This class manages the conversion from human readable from/to strings
         to the regular expressions that helps to recover the data
     """
-    def __init__(self, uri_str, logger=None):
+    def __init__(self, uri_str, no_match_vars=[], logger=None):
         self.logger = logger or logging.getLogger(__name__)
         self.uri_str = uri_str
         self.vars = GET_VARS.findall(uri_str)
         self.protocol = self.get_protocol()
         self.basepath = self.get_basepath()
-
+        self.no_match_vars = no_match_vars
         uri_path = PROTOCOL.split(uri_str)[2]
 
         parts = GET_VARS.split(uri_path)                         # recover the variables into the URL
@@ -32,7 +33,11 @@ class Uri:
 
     def _subs_var(self, part):
         if part in self.vars:
-            return PARSE_VAR.format(part)
+            stuffed = self.no_match_vars.get(part, ".")
+            if stuffed == ".":
+                return PARSE_VAR.format(part)
+            else:
+                return PARSE_NO_VAR.format(part, stuffed)
         else:
             return part
 
@@ -52,9 +57,11 @@ class Uri:
             return value_vars[check.groups()[0]]
 
         output_format = self.uri_str
-        for key in value_vars.keys():
-            if key in self.vars:
-                output_format = output_format.replace(r"{{{}}}".format(key), value_vars.get(key, check_replicas(key)))
+        output_vars = GET_VARS.findall(self.uri_str)
+        for key in output_vars:                         # check the vars into the to: string
+            replaced_var = check_replica(key)           # replace var<num> per var
+            if replaced_var in self.vars:               # FIXME: case no var<empty>, must be validate
+                output_format = output_format.replace(r"{{{}}}".format(key), value_vars.get(replaced_var))
         if "{" not in output_format:
             self.logger.debug("Uri {} replaced to {}".format(self.uri_str, output_format))
 
@@ -97,8 +104,9 @@ class Rule:
             self.from_start_search = Rule.get_starting_path(self.from_str)
             self.to_str = rule['to']
             self.to_provider = Rule.get_provider(rule['to'])
-            self.from_uri = Uri(self.from_str)
-            self.to_uri = Uri(self.to_str)
+            self.no_match_vars = rule.get('no_match_vars', [])
+            self.from_uri = Uri(self.from_str, self.no_match_vars)
+            self.to_uri = Uri(self.to_str, {})  # we do not pass no_match_vars because its pointless
             self.glacier = rule.get('glacier', False)
             # Not implemented self.delete_after = rule.get('delete_after', True)
             self.logger.info("loaded Rule {}".format(self))
