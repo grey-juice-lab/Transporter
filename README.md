@@ -56,11 +56,11 @@ Instead of that, you have to add a counter to the variable you want to duplicate
 
 to: "s3://gjl-client-backup/{client}/{**encoding**}/{code}_{**encoding2**}_{rest}.NEW"
 
-####Glacier
+#### Glacier
 
 this attribute indicates if we want to move the file directly to the glacier. 
 
-####no_match_vars
+#### no_match_vars
 
 Sometimes there are some ambiguity into the filenames that makes difficult to understand which part belongs to one variable or not. 
 
