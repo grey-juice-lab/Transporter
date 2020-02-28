@@ -33,10 +33,49 @@ A sample of rule can be showed below:
           description: first rule. Does something
           from: "file://Users/manel/work/origin/{CLIENT}/output_path/{FILE}
           to: "file://output/{CLIENT}/{FILE}
+          
+        - id: "rule_testing"
+          description: "first test to moving"
+          from: "file://var/gjl/test/{client}/4.Content_Delivered/{path}/{code}_{encoding}_{rest}.{ext}"
+          to: "s3://gjl-client-backup/{client}/{encoding}/{code}_{encoding2}_{rest}.NEW"
           glacier: false
+          no_match_vars:
+              code: "_"
+              encoding: "_"
+              rest: "."
 
-        - id: "rule_2"
-          description: first rule. Does something
-          from: "file://Users/manel/work/origin/{CLIENT}/output_path/{FILE}
-          to: "s3://bucket_backup/{CLIENT}/{FILE}
-          glacier: true
+
+### Points to have into account: 
+#### Variables: 
+They allow define part of the "from" expression to reuse into the "to" one.
+
+**Important**:
+
+Into the "to" expression, you cannot duplicate variables. If you do that, a rule creation error will be raised.
+Instead of that, you have to add a counter to the variable you want to duplicate. Check the case:
+
+to: "s3://gjl-client-backup/{client}/{**encoding**}/{code}_{**encoding2**}_{rest}.NEW"
+
+####Glacier
+
+this attribute indicates if we want to move the file directly to the glacier. 
+
+####no_match_vars
+
+Sometimes there are some ambiguity into the filenames that makes difficult to understand which part belongs to one variable or not. 
+
+For example, if we check this expression: 
+
+{code}_{encoding2}_{rest}.txt 
+
+If encoding2 has a "_" inside, it will frame the parser. Is to avoid that that no_match_vars attribute comes in.
+This hash list points, for every variable we define, what characters will not be contained on it. That helps the parser to 
+pick the right decisions.
+
+
+ 
+
+
+
+
+

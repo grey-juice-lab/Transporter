@@ -56,7 +56,7 @@ class Transporter:
             self.logger.info("Starting file collection...")
             for rule in self.rules_set.rules:
                 self.logger.debug("checking rule {}".format(rule))
-                if rule.from_provider == 'file':
+                if rule.from_provider == 'file':        # FIXME: in a future can be extended to move s3 -> s3
                     for file in self.mover.file_get_by_prefix(rule.from_basepath):
                         self.logger.debug("checking file: {}".format(file))
                         new_file = rule.check_rule(file)
@@ -82,6 +82,19 @@ class Transporter:
                 return True
             else:
                 return False
+
+    def check_file(self, the_file):
+        self.logger.info("checking file with the current rules")
+        for rule in self.rules_set.rules:
+            self.logger.info("checking rule {}".format(rule))
+            new_file = rule.check_rule(the_file)
+            if new_file:
+                self.logger.info("File match with rule {}".format(rule.id))
+                self.logger.info("Origin: {}".format(the_file))
+                self.logger.info("Destination: {}".format(new_file))
+                return True
+        self.logger.info("File does not match")
+        return False
 
     def summary(self):
         if len(self.rules_set.rules) == 0:      # No rules found.
@@ -121,15 +134,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="This script moves files following a set or rules")
     parser.add_argument("rules_path", help="path where the rules are")
     parser.add_argument("-dryrun", help="just checks what it will do", action="store_true")
+    parser.add_argument("-checkfile", help="just checks the file against the loaded rules")
 
     args = parser.parse_args()
     fileConfig('logging_config.ini')
     logger = logging.getLogger()
-
     tr = Transporter(args.rules_path, logger, args.dryrun)
-    try:
-        tr.run()
-        tr.summary()
-    except Exception as e:
-        logger.error("Some error comes up with the execution:", exc_info=True)
-        send_email(subject="Transporter: some error happened running it ", body=e)
+    if args.checkfile:
+        tr.check_file(args.checkfile)
+    else:
+        try:
+            tr.run()
+            tr.summary()
+        except Exception as e:
+            logger.error("Some error comes up with the execution:", exc_info=True)
+            send_email(subject="Transporter: some error happened running it ", body=e)
