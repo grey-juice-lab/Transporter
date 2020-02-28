@@ -66,7 +66,7 @@ Sometimes there are some ambiguity into the filenames that makes difficult to un
 
 For example, if we check this expression: 
 
-{code}_{encoding2}_{rest}.txt 
+{code}\_{encoding2}\_{rest}.txt 
 
 If encoding2 has a "_" inside, it will frame the parser. Is to avoid that that no_match_vars attribute comes in.
 This hash list points, for every variable we define, what characters will not be contained on it. That helps the parser to 
