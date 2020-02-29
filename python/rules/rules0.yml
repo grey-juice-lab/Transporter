@@ -2,7 +2,11 @@
 rules:
     - id: "zero_rule_test"
       description: "move from a to b"
-      from: "file://tmp/origin/{client}/4.results/{file}"
-      to: "s3://gjl-client-backup/{client}/{file}"
+      from: "file://tmp/origin/{client}/4.results/{file}.{ext}"
+      to: "s3://gjl-client-backup/{client}/{file}.new_extension_{ext}"
       glacier: true
       delete_after: true
+      no_match_vars:
+        file: "."
+        ext: "."
+
