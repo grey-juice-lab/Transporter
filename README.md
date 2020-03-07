@@ -1,5 +1,5 @@
-# transporter
-project to move file among devices 2 s3.
+# Transporter
+project to move file among filesystem to s3.
 
 
 ## How to install it
@@ -12,7 +12,7 @@ The steps to install are the following ones:
     pip install -r requirements.txt
 
 ## The rules file
-Transporter works becase there are rules that must follow. This rules are gathered into a folder, in one or more files.
+Transporter works because there are rules that must follow. This rules are gathered into a folder, in one or more files.
 The rules file is a simple YAML file where rules are a list of dictionaries.
 A sample of rule can be showed below:
 
